@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManagerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,11 +26,37 @@ public class GreetingController {
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
 
+    @Autowired
+    private Greeting x;
+    
+    @Autowired  //connect ke object tertentu yg sudah ada di server
+    private EntityManagerFactory em;
+    
+    @CrossOrigin(origins= {"*"}) //dpt mengakses data di wilayahnya
+    
+    @RequestMapping("/actors")
+    public List<Actor> allActors() {
+    	return em.createEntityManager().createQuery("from Actor").getResultList();
+    }
+    
+    @CrossOrigin(origins= {"*"})
+    @RequestMapping("/film")
+    public List<Film> allFilm(){
+    	return em.createEntityManager().createQuery("from Film").getResultList();
+    }
+    
+    @RequestMapping("/filmactors")
+    public List<FilmActorPK> allFilmActor(){
+    	return em.createEntityManager().createQuery("from FilmActor").getResultList();
+    }
+    
+    
     @RequestMapping("/greeting")
     public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-        return new Greeting(counter.incrementAndGet(),
+        return x;}
+        		//new Greeting(counter.incrementAndGet(),       		
     
-        		String.format(template, name));}
+        		//String.format(template, name));}
         
      @RequestMapping("/data")
      public List<String> dataNegara (@RequestParam("pre") String prefix){
@@ -69,10 +99,10 @@ public class GreetingController {
      }
      return builder.toString();
     
-     return new BufferedReader(
+     /*return new BufferedReader(
     		 new InputStreamReader(stream)).
     		 lines().
-    		 collect(Collectors.joining("\n"));
+    		 collect(Collectors.joining("\n"));*/
 }
      
 }
