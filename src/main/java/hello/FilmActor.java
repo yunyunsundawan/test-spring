@@ -22,8 +22,8 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import model.Actor;
-import model.Film;
+import hello.model.Actor;
+import hello.model.Film;
 
 /**
  *

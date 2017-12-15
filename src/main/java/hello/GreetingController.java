@@ -1,5 +1,7 @@
 package hello;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,23 +10,29 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import model.Actor;
-import model.Film;
-import model.Greeting;
+import hello.model.Actor;
+import hello.model.Film;
+import hello.model.Greeting;
+
 
 @RestController
+@RequestMapping("/greet")
 public class GreetingController {
 
     private static final String template = "Hello, %s!";
@@ -36,8 +44,53 @@ public class GreetingController {
     @Autowired  //connect ke object tertentu yg sudah ada di server
     private EntityManagerFactory em;
     
-    @CrossOrigin(origins= {"*"}) //dpt mengakses data di wilayahnya
+    //@RequestMapping(method= {RequestMethod.POST,RequestMethod.GET})
+    @PostMapping("addActor")
+    public int addActor() {
+    	int hasil = 0;
+    	try {
+    		Actor actor2 = new Actor();
+    		actor2.setFirstName("Bandung");
+    		actor2.setLastName("Lautan");
+    		actor2.setLastUpdate(new Date());
+    		
+    	EntityManager e = em.createEntityManager(); //persist sama dengan save
+    	e.getTransaction().begin();
+    	e.persist(actor2);
+    	e.getTransaction().commit();
+    	
+    } catch (Exception ex) {
+    	System.out.println(ex.getMessage());
+    	hasil = -1;
+    }
+    	return hasil;
+    }
     
+    
+    @PostMapping("editActor")
+    public int editActor(@RequestParam("id") Short id) {
+    	int hasil = 0;
+    	try {
+    		EntityManager e = em.createEntityManager(); 
+    		
+    		e.getTransaction().begin();
+    		
+    		Actor actor2 = e.find(Actor.class, id);
+    		actor2.setFirstName("Jakarta");
+    		actor2.setLastName("Genangan");
+    		actor2.setLastUpdate(new Date());
+    	  		
+        	e.getTransaction().commit();
+    	
+    } catch (Exception ex) {
+    	System.out.println(ex.getMessage());
+    	hasil = -1;
+    }
+    	return hasil;
+    }
+    
+    
+    @CrossOrigin(origins= {"*"}) //dpt mengakses data di wilayahnya
     @RequestMapping("/actors")
     public List<Actor> allActors() {
     	return em.createEntityManager().createQuery("from Actor").getResultList();
